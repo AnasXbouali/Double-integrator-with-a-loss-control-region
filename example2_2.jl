@@ -7,12 +7,8 @@ using Roots
 function G(x, y, k=100)
     return 1 / (1 + exp(-k * ((x-2)^2 + (y+2)^2 - 1)))
 end
-x = range(-1,4, length=200)
-y = range(-5,1, length=200)
 
-z1 = [G(xi, yi) for xi in x, yi in y]
-p1=heatmap(x, y, z1', color=:viridis, aspect_ratio=:equal, xlabel="x", ylabel="y") 
-
+ε = 1e-4
 
 DI = @def begin
 
@@ -109,3 +105,4 @@ q2_(t)= sol_.costate(t)[2]
 plot(q1_, 0,tf_, color="purple4", lw=1.5, label="costate p1")
 CC = plot!(q2_, 0,tf_, color="mediumorchid1", lw=1.5, label="costate p2")
 plot(AA, BB, CC, layout=(1, 3), size=(1600,600))
+savefig("plott2.pdf")
