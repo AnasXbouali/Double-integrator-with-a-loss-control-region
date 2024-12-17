@@ -4,7 +4,7 @@ using Plots
 using Plots.PlotMeasures
 using Roots
 
-function F(x, y, k=130)
+function F(x, y, k=100)
     return 1 / (1 + exp(-k * (y - x)))
 end
 
@@ -33,13 +33,13 @@ DI = @def begin
     tf + ∫(ε*(v(t))^2 + (1-F(x1(t), x2(t)))*(u(t))^2) → min
 end
 
-sol1 = solve(DI; init = (state = t -> [0.1, 0.1, 0.1], control = [0.1,0.1], variable = 25), grid_size=50)
+sol1 = solve(DI; init = (state = t -> [0.1, 0.1, 0.1], control = [0.1,0.1], variable = 17), grid_size=50)
 sol2 = solve(DI; init = sol1, grid_size=100)
 sol3 = solve(DI; init = sol2, grid_size=200)
 sol4 = solve(DI; init = sol3, grid_size=300)
 sol5 = solve(DI; init = sol4, grid_size=400)
 sol6 = solve(DI; init = sol5, grid_size=500)
-sol  = solve(DI; init = sol6, grid_size=1000, print_level=4)
+sol  = solve(DI; init = sol6, grid_size=2000, print_level=4)
 
 # Extract solution
 tf   = sol.variable
@@ -48,8 +48,8 @@ y2(t)= sol.state(t)[2]
 plt = plot(y1, y2, 0, tf, color="blue", label=false)
 
 # Plot states
-x = range(-3., 3., length=200)
-y = range(-3., 3., length=200)
+x = range(-4., 4., length=200)
+y = range(-4., 4., length=200)
 Z = [y > x for x in x, y in y]
 heatmap!(plt, x, y, Z, color=[:lightgreen, :red2], fillalpha=0.4, colorbar=false)
 plot!(
@@ -83,10 +83,6 @@ plot(q1, 0,tf, color="purple4", lw=1.5, label="costate p1")
 C = plot!(q2, 0,tf, color="mediumorchid1", lw=1.5, label="costate p2")
 
 plot(A,B,C,layout=(1, 3), size=(1600,600))
-
-
-
-
-
+savefig("plot2.pdf")
 
 
