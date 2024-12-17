@@ -4,13 +4,11 @@ using Plots
 using Plots.PlotMeasures
 using Roots
 
-function F(x, y, k=80)
+function F(x, y, k=100)
     return 1 / (1 + exp(-k * (y - x)))
 end
 
 ε  = 1e-4 
-
-# First example: intial condition (2,0)
 
 DI = @def begin
 
@@ -40,7 +38,7 @@ sol3 = solve(DI; init = sol2, grid_size=200)
 sol4 = solve(DI; init = sol3, grid_size=300)
 sol5 = solve(DI; init = sol4, grid_size=400)
 sol6 = solve(DI; init = sol5, grid_size=500)
-sol  = solve(DI; init = sol6, grid_size=1000, print_level=4)
+sol  = solve(DI; init = sol6, grid_size=3000, print_level=4)
 
 # Extract solution
 tf   = sol.variable
@@ -81,3 +79,4 @@ plot(q1, 0,tf, color="purple4", lw=1.5, label="costate p1")
 C = plot!(q2, 0,tf, color="mediumorchid1", lw=1.5, label="costate p2")
 
 plot(A,B,C,layout=(1, 3), size=(1600,600))
+savefig("plot1.pdf")
