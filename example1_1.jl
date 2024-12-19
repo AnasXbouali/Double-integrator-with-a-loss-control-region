@@ -4,11 +4,13 @@ using Plots
 using Plots.PlotMeasures
 using Roots
 
-function F(x, y, k=100)
+function F(x, y, k=80)
     return 1 / (1 + exp(-k * (y - x)))
 end
 
 ε  = 1e-4 
+
+# First example: intial condition (2,0)
 
 DI = @def begin
 
@@ -32,13 +34,17 @@ DI = @def begin
     tf + ∫( ε*(v(t))^2 + (1-F(x1(t), x2(t)))*(u(t))^2 ) → min
 end
 
-sol1 = solve(DI; init = (state = t -> [0.1, 0.1, 1], control = [1,0], variable = 30), grid_size=50)
-sol2 = solve(DI; init = sol1, grid_size=100)
-sol3 = solve(DI; init = sol2, grid_size=200)
-sol4 = solve(DI; init = sol3, grid_size=300)
-sol5 = solve(DI; init = sol4, grid_size=400)
-sol6 = solve(DI; init = sol5, grid_size=500)
-sol  = solve(DI; init = sol6, grid_size=3000, print_level=4)
+sol1 = solve(DI; init = (state = t -> [0.1, 0.1, 1], control = [1,0], variable = 30), grid_size=50, print_level=4)
+objective(sol1)
+sol2 = solve(DI; init = sol1, grid_size=200, print_level=4)
+objective(sol2)
+sol3 = solve(DI; init = sol2, grid_size=400,  print_level=4)
+objective(sol3)
+sol4 = solve(DI; init = sol3, grid_size=800, print_level=4)
+objective(sol4)
+sol = solve(DI; init = sol4, grid_size=1600, print_level=4)
+objective(sol)
+
 
 # Extract solution
 tf   = sol.variable
@@ -78,5 +84,5 @@ q2(t)= sol.costate(t)[2]
 plot(q1, 0,tf, color="purple4", lw=1.5, label="costate p1")
 C = plot!(q2, 0,tf, color="mediumorchid1", lw=1.5, label="costate p2")
 
-plot(A,B,C,layout=(1, 3), size=(1600,600))
+plot(A,B,C,layout=(1, 3), size=(1600,500))
 savefig("plot1.pdf")
