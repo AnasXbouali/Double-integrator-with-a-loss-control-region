@@ -32,18 +32,25 @@ DI = @def begin
     tf + ∫( ε*(v(t))^2 + (1-G(x1(t), x2(t)))*(u(t))^2 ) → min
 end
 
-sol1_ = solve(DI; init = (state = t -> [0.1, 0.1, 1], control = [1,0], variable = 30), grid_size=50)
-sol2_ = solve(DI; init = sol1_, grid_size=100)
-sol3_ = solve(DI; init = sol2_, grid_size=200)
-sol4_ = solve(DI; init = sol3_, grid_size=300)
-sol5_ = solve(DI; init = sol4_, grid_size=400)
-sol6_ = solve(DI; init = sol5_, grid_size=500)
-sol_  = solve(DI; init = sol6_, grid_size=1500)
+sol1 = solve(DI; init = (state = t -> [0.1, 0.1, 0.1], control = [0.1,0.1], variable = 17), grid_size=50, print_level=4)
+objective(sol1)
 
-tf_   = sol_.variable
-y1_(t)= sol_.state(t)[1]
-y2_(t)= sol_.state(t)[2]
-p_ = plot(y1_, y2_, 0, tf_, color="blue", label=false)
+sol2 = solve(DI; init = sol1, grid_size=200,  print_level=4)
+objective(sol2)
+
+sol3 = solve(DI; init = sol2, grid_size=400,print_level=4)
+objective(sol3)
+
+sol4 = solve(DI; init = sol3, grid_size=800, print_level=4)
+objective(sol4)
+
+sol = solve(DI; init = sol4, grid_size=1600, print_level=4)
+objective(sol)
+
+tf   = sol.variable
+y1(t)= sol.state(t)[1]
+y2(t)= sol.state(t)[2]
+p = plot(y1, y2, 0, tf, color="blue", label=false)
 
 
 # Create the plot
@@ -79,30 +86,30 @@ plot!(plt_, circle_x, circle_y, fill=true, fillcolor=:white, fillalpha=1,
 plot!(plt_, circle_x, circle_y, fill=true, fillcolor=:red2, fillalpha=0.4, 
 label=false, linecolor=:black, linewidth=1)
 
-AA = plot!(plt_, y1_, y2_, 0, tf_, color="blue", lw=1.5, label="optimal trajectory")
+A = plot!(plt_, y1, y2, 0, tf, color="blue", lw=1.5, label="optimal trajectory")
 
-diff_func_(t) = (y1_(t)-2)^2 + (y2_(t)+2)^2 - 1
+diff_func_(t) = (y1(t)-2)^2 + (y2(t)+2)^2 - 1
 t_cross_ = find_zero(diff_func_, (3, 4), Bisection())
 t_cross2_ = find_zero(diff_func_, (4,5), Bisection())
 
-u_(t) = sol_.control(t)[1]
-λ0(t)= sol_.state(t)[3]
-function control_(t)
+u(t) = sol.control(t)[1]
+λ0(t)= sol.state(t)[3]
+function control(t)
     if t <= t_cross_
-        return u_(t)
+        return u(t)
     elseif t_cross_ <= t <= t_cross2_
         return λ0(t)
     elseif t_cross2_ <= t 
-        return u_(t)
+        return u(t)
     end
 end
-BB = plot(control_, 0, tf_, color="red", lw=1.5, label="optimal control")
+B = plot(control, 0, tf, color="red", lw=1.5, label="optimal control")
 
-q1_(t)= sol_.costate(t)[1]
-q2_(t)= sol_.costate(t)[2]
+q1(t)= sol.costate(t)[1]
+q2(t)= sol.costate(t)[2]
 
 
-plot(q1_, 0,tf_, color="purple4", lw=1.5, label="costate p1")
-CC = plot!(q2_, 0,tf_, color="mediumorchid1", lw=1.5, label="costate p2")
-plot(AA, BB, CC, layout=(1, 3), size=(1600,600))
+plot(q1, 0,tf, color="purple4", lw=1.5, label="costate p1")
+C = plot!(q2, 0,tf, color="mediumorchid1", lw=1.5, label="costate p2")
+plot(A, B, C, layout=(1, 3), size=(1600,500))
 savefig("plott1.pdf")
